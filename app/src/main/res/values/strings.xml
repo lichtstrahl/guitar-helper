@@ -6,4 +6,9 @@
     <string name="label_settings">Настройки</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_permissions">Разрешения</string>
+    <string name="label_permission_audio_record">Доступ к микрофону</string>
+    <string name="permission_audio_record_denied">Доступ к микрофону не выдан</string>
+    <string name="ok">OK</string>
+    <string name="cancel">CANCEL</string>
 </resources>
