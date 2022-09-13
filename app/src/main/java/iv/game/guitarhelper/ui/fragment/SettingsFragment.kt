@@ -10,7 +10,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,7 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.button.MaterialButton
 import iv.game.guitarhelper.R
 import iv.game.guitarhelper.databinding.FragmentSettingsBinding
 
@@ -26,7 +25,7 @@ import iv.game.guitarhelper.databinding.FragmentSettingsBinding
 class SettingsFragment : Fragment() {
 
     // Views
-    private lateinit var audioRecordSwitchView: SwitchMaterial
+    private lateinit var audioRecordButton: MaterialButton
 
     // Permissions
     private var permissionAudioRecordGranted = false
@@ -34,28 +33,6 @@ class SettingsFragment : Fragment() {
     // Utils
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var shownRationaleAudioRecord = false
-    private val audioRecordSwitchCheckedChangeListener = object : CompoundButton.OnCheckedChangeListener {
-        override fun onCheckedChanged(button: CompoundButton, state: Boolean) {
-            if (state) {
-                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
-                    if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
-                        showAudioRecordPermissionExplanationDialog()
-                    } else if (shownRationaleAudioRecord) {
-                        showAudioRecordPermissionDeniedDialog()
-                    } else {
-                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    }
-                }
-            } else {
-                // TODO Пока не реализован отзыв разрешений
-                button.changeSwitch(this, true)
-            }
-        }
-    }
-
-    companion object {
-        private const val REQUEST_AUDIO_RECORD_PERMISSION = 1
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +43,7 @@ class SettingsFragment : Fragment() {
         initClickListeners()
 
         permissionAudioRecordGranted = (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)
-            .apply { audioRecordSwitchView.changeSwitch(audioRecordSwitchCheckedChangeListener, this) }
+            .apply { audioRecordButton.togglePermission(this) }
 
         return view
     }
@@ -78,8 +55,9 @@ class SettingsFragment : Fragment() {
             // TODO Debug toasts
             if (isGranted) {
                 Toast.makeText(context, "Permission granted!", Toast.LENGTH_SHORT).show()
+                audioRecordButton.enablePermission()
             } else {
-                audioRecordSwitchView.changeSwitch(audioRecordSwitchCheckedChangeListener, false)
+                audioRecordButton.disablePermission()
                 Toast.makeText(context, "Permission not granted ((", Toast.LENGTH_SHORT).show()
             }
         }
@@ -97,11 +75,21 @@ class SettingsFragment : Fragment() {
 
     private fun View.binding() = this.apply {
         FragmentSettingsBinding.bind(this)
-            .apply { audioRecordSwitchView = this.permissionAudioRecord }
+            .apply { audioRecordButton = this.permissionAudioRecord }
     }
 
     private fun initClickListeners() {
-        audioRecordSwitchView.setOnCheckedChangeListener(audioRecordSwitchCheckedChangeListener)
+        audioRecordButton.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                    showAudioRecordPermissionExplanationDialog()
+                } else if (shownRationaleAudioRecord) {
+                    showAudioRecordPermissionDeniedDialog()
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+        }
     }
 
     /**
@@ -115,7 +103,7 @@ class SettingsFragment : Fragment() {
             dialog.dismiss()
         }
         .setNegativeButton("NO") { dialog, _ ->
-            audioRecordSwitchView.changeSwitch(audioRecordSwitchCheckedChangeListener, false)
+            audioRecordButton.disablePermission()
             dialog.dismiss()
         }
         .show()
@@ -137,10 +125,19 @@ class SettingsFragment : Fragment() {
         }
         .show()
 
-    private fun CompoundButton.changeSwitch(listener: CompoundButton.OnCheckedChangeListener, state: Boolean) {
-        this.setOnCheckedChangeListener(null)
-        this.isChecked = state
-        this.isEnabled = !isChecked
-        this.setOnCheckedChangeListener(listener)
+    private fun MaterialButton.togglePermission(enabled: Boolean) = if (enabled)
+        this.enablePermission()
+    else
+        this.disablePermission()
+
+    private fun MaterialButton.enablePermission() {
+        this.isEnabled = false
+        this.setText(R.string.granted)
     }
+
+    private fun MaterialButton.disablePermission() {
+        this.isEnabled = true
+        this.setText(R.string.not_granted)
+    }
+
 }
