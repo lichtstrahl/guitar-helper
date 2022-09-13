@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import be.tarsos.dsp.io.android.AudioDispatcherFactory
+import iv.game.guitarhelper.audio.processor.LogAudioProcessor
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -20,21 +22,20 @@ class IvAudioRecorder(
         private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO
         private const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
         private val BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLE_RATE_HZ, CHANNEL_CONFIG, ENCODING)
+//        private val TARSOS_FORMAT = TarsosDSPAudioFormat(SAMPLE_RATE_HZ.toFloat(), 16, 1, true, false)
     }
 
     fun start() {
         Timber.i("Start")
         val recorder = AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE_HZ, CHANNEL_CONFIG, ENCODING, BUFFER_SIZE)
         recorder.startRecording()
+
+        val audioDispatcher = AudioDispatcherFactory.fromDefaultMicrophone(SAMPLE_RATE_HZ, BUFFER_SIZE, BUFFER_SIZE/2)
+            .apply { addAudioProcessor(LogAudioProcessor()) }
+
         this.scope = CoroutineScope(Dispatchers.IO + Job()).apply {
             this.launch {
-                val data = ByteArray(BUFFER_SIZE/2)
-
-                while (true) {
-                    val read = recorder.read(data, 0, data.size)
-                    Timber.d("Read $read bytes")
-                    Timber.d("[${data[0]},${data[1]},${data[2]},${data[3]},${data[4]}]")
-                }
+                audioDispatcher.run()
             }
         }
 
