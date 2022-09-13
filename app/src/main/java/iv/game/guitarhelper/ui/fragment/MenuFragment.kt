@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import iv.game.guitarhelper.R
 import iv.game.guitarhelper.databinding.FragmentMenuBinding
+import iv.game.guitarhelper.ui.addFragment
 
 class MenuFragment: Fragment() {
 
@@ -51,17 +51,16 @@ class MenuFragment: Fragment() {
      * @param menuItemId Идентификатор выбранного элемента
      */
     private fun openMenuPage(menuItemId: Int) = when (menuItemId) {
-        R.id.bottom_menu_home -> this.requireActivity()
-            .supportFragmentManager
-            .openMenuPage(HomeFragment())
-        R.id.bottom_menu_settings -> this.requireActivity()
-            .supportFragmentManager
-            .openMenuPage(SettingsFragment())
+        R.id.bottom_menu_home -> openMenuPage(HomeFragment(), "menu-home")
+        R.id.bottom_menu_settings -> openMenuPage(SettingsFragment(), "menu-settings")
         else ->  throw IllegalStateException("Illegal menu item: $menuItemId")
     }
 
-    private fun FragmentManager.openMenuPage(fragment: Fragment) = this
-        .beginTransaction()
-        .add(R.id.page_container, fragment, null)
-        .commit()
+    private fun openMenuPage(fragment: Fragment, tag: String) {
+        if (childFragmentManager.fragments.lastOrNull()?.tag != tag) {
+
+            val hideFragment = childFragmentManager.fragments.lastOrNull()
+            childFragmentManager.addFragment(R.id.page_container, fragment, tag, hideFragment)
+        }
+    }
 }

@@ -10,6 +10,14 @@
     <string name="ok">OK</string>
     <string name="cancel">CANCEL</string>
 
+    <!-- permissions -->
     <string name="granted">Получено</string>
     <string name="not_granted">Не выдано</string>
+
+    <!-- menu items -->
+    <string name="menu_item_1">Тестовая запись звука</string>
+    <string name="menu_item_2">Отрисовка и просмотр аккордов</string>
+    <string name="menu_item_3">Ещё какая-то ерунда</string>
+
+    <string name="not_content">not-content</string>
 </resources>
