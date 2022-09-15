@@ -12,6 +12,7 @@ import iv.game.guitarhelper.databinding.FragmentHomeBinding
 import iv.game.guitarhelper.ui.addFragment
 import iv.game.guitarhelper.ui.component.adapter.HomeMenuItemAdapter
 import iv.game.guitarhelper.ui.component.model.HomeMenuItem
+import iv.game.guitarhelper.ui.fragment.game.LearnNoteFragment
 
 class HomeFragment: Fragment() {
 
@@ -53,6 +54,6 @@ class HomeFragment: Fragment() {
     private fun menuItems(): List<HomeMenuItem> = listOf(
         HomeMenuItem(requireContext(), R.string.menu_item_1, R.drawable.ic_music_note, R.color.green_light) { AudioRecordFragment() },
         HomeMenuItem(requireContext(), R.string.menu_item_2, R.drawable.ic_columns, R.color.yellow_light) { AudioRecordFragment() },
-        HomeMenuItem(requireContext(), R.string.menu_item_3, R.drawable.ic_sk_key, R.color.orange_light) { AudioRecordFragment() }
+        HomeMenuItem(requireContext(), R.string.menu_item_3, R.drawable.ic_sk_key, R.color.orange_light) { LearnNoteFragment.getInstance(20, 10) }
     )
 }

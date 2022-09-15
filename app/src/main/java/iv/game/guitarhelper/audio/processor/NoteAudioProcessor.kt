@@ -1,23 +1,25 @@
 package iv.game.guitarhelper.audio.processor
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import be.tarsos.dsp.AudioEvent
 import be.tarsos.dsp.AudioProcessor
 import be.tarsos.dsp.pitch.DynamicWavelet
-import iv.game.guitarhelper.audio.AudioConfig
 import iv.game.guitarhelper.audio.note.Note
-import iv.game.guitarhelper.ui.component.model.NoteEvent
+import iv.game.guitarhelper.ui.component.model.NoteInfo
 import timber.log.Timber
 
 /**
  * Компонент анализирует аудио-поток и определяет была ли там нота
  */
 class NoteAudioProcessor(
-    private val notes: MutableLiveData<NoteEvent>,
-    rate: Int = AudioConfig.SAMPLE_RATE_HZ,
-    bufferSize: Int = AudioConfig.BUFFER_SIZE,
-    private val threshold: Double = 3e-5
+    rate: Int,
+    bufferSize: Int,
+    private val threshold: Double
 ): AudioProcessor {
+
+    private val internalNotes = MutableLiveData<NoteInfo>()
+    val notes: LiveData<NoteInfo> = internalNotes
 
     private val noteAnalyzer = DynamicWavelet(rate.toFloat(), bufferSize)
 
@@ -30,7 +32,7 @@ class NoteAudioProcessor(
             Timber.i("Avg amplitude: ${audioEvent.floatBuffer.average()}")
             Note.note(result.pitch)?.let {
                 Timber.i("Find note $it")
-                notes.postValue(NoteEvent(it, result.isPitched, result.pitch))
+                internalNotes.postValue(NoteInfo(it, result.isPitched, result.pitch))
             } ?: run {
                 if (result.isPitched) {
                     Timber.i("not found note but pitched: Hz: ${result.pitch}")

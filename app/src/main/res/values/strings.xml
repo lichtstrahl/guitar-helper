@@ -19,5 +19,9 @@
     <string name="menu_item_2">Отрисовка и просмотр аккордов</string>
     <string name="menu_item_3">Ещё какая-то ерунда</string>
 
+    <!-- win/defeat -->
+    <string name="win">Победа</string>
+    <string name="defeat">Время вышло</string>
+
     <string name="not_content">not-content</string>
 </resources>

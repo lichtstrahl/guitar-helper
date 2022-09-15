@@ -7,4 +7,5 @@
     <dimen name="padding_middle">8dp</dimen>
     <dimen name="padding_large">12dp</dimen>
     <dimen name="padding_extra_large">16dp</dimen>
+    <dimen name="single_note">80sp</dimen>
 </resources>

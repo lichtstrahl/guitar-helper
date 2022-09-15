@@ -12,6 +12,7 @@ import androidx.lifecycle.get
 import iv.game.guitarhelper.R
 import iv.game.guitarhelper.databinding.FragmentAudioRecordBinding
 import iv.game.guitarhelper.ui.component.model.NoteEvent
+import iv.game.guitarhelper.ui.component.model.NoteInfo
 import iv.game.guitarhelper.viewmodel.AudioRecordViewModel
 import iv.game.guitarhelper.viewmodel.ViewModelFactory
 import kotlin.math.min
@@ -55,7 +56,7 @@ class AudioRecordFragment: Fragment() {
             .apply { this@AudioRecordFragment.amplitudeView = amplitudeView }
     }
 
-    private fun drawNoteEvent(event: NoteEvent) {
+    private fun drawNoteEvent(event: NoteInfo) {
         val text = listOf(event.target.name) + lastNotesView.text.split(" ")
         val n = text.size
         lastNotesView.text = text.subList(0, min(5, n)).joinToString(separator = " ")

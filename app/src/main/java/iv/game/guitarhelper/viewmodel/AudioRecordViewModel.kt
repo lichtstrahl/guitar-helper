@@ -4,26 +4,26 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import be.tarsos.dsp.AudioDispatcher
-import be.tarsos.dsp.io.android.AudioDispatcherFactory
-import iv.game.guitarhelper.audio.AudioConfig.BUFFER_SIZE
-import iv.game.guitarhelper.audio.AudioConfig.SAMPLE_RATE_HZ
 import iv.game.guitarhelper.audio.processor.NoteAudioProcessor
 import iv.game.guitarhelper.ui.component.model.NoteEvent
-import kotlinx.coroutines.*
+import iv.game.guitarhelper.ui.component.model.NoteInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 // TODO Пока отключил проверку разрешений. Подразумевается что здесь они уже 100% выданы
 @SuppressLint("MissingPermission")
-class AudioRecordViewModel: ViewModel() {
-
-
-    private var scope: CoroutineScope? = null
-    private var audioDispatcher: AudioDispatcher? = null
+class AudioRecordViewModel @Inject constructor(
+    private val audioDispatcher: AudioDispatcher,
+    private val noteAudioProcessor: NoteAudioProcessor
+): ViewModel() {
 
     // LiveData
-    private val internalNotes = MutableLiveData<NoteEvent>()
-    val notes: LiveData<NoteEvent> = internalNotes
+    val notes: LiveData<NoteInfo> = noteAudioProcessor.notes
 
     private val internalAmplitude = MutableLiveData<Double>()
     val amplitude: LiveData<Double> = internalAmplitude
@@ -31,24 +31,17 @@ class AudioRecordViewModel: ViewModel() {
     fun startRecord() {
         Timber.i("Start record")
 
-        val audioDispatcher = AudioDispatcherFactory.fromDefaultMicrophone(SAMPLE_RATE_HZ, BUFFER_SIZE, BUFFER_SIZE/2)
-            .apply { addAudioProcessor(NoteAudioProcessor(internalNotes)) }
+        audioDispatcher.addAudioProcessor(noteAudioProcessor)
 
-        this.scope = CoroutineScope(Dispatchers.IO + Job()).apply {
-            this.launch {
-                audioDispatcher.run()
-            }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { audioDispatcher.run() }
         }
-
-        this.audioDispatcher = audioDispatcher
+        Timber.i("Start record finish")
     }
 
     override fun onCleared() {
         super.onCleared()
         Timber.i("onCleared")
-        audioDispatcher?.stop()
-        audioDispatcher = null
-        scope?.cancel()
-        scope = null
+        audioDispatcher.stop()
     }
 }
