@@ -15,7 +15,8 @@ import timber.log.Timber
 class NoteAudioProcessor(
     private val notes: MutableLiveData<NoteEvent>,
     rate: Int = AudioConfig.SAMPLE_RATE_HZ,
-    bufferSize: Int = AudioConfig.BUFFER_SIZE
+    bufferSize: Int = AudioConfig.BUFFER_SIZE,
+    private val threshold: Double = 3e-5
 ): AudioProcessor {
 
     private val noteAnalyzer = DynamicWavelet(rate.toFloat(), bufferSize)
@@ -24,12 +25,16 @@ class NoteAudioProcessor(
 
         val result = noteAnalyzer.getPitch(audioEvent.floatBuffer)
 
-        Note.note(result.pitch)?.let {
-            Timber.i("Find note $it")
-            notes.postValue(NoteEvent(it, result.isPitched, result.pitch))
-        } ?: run {
-            if (result.isPitched) {
-                Timber.i("not found note but pitched: Hz: ${result.pitch}")
+        val avgAmplitude = audioEvent.floatBuffer.average()
+        if (avgAmplitude > threshold) {
+            Timber.i("Avg amplitude: ${audioEvent.floatBuffer.average()}")
+            Note.note(result.pitch)?.let {
+                Timber.i("Find note $it")
+                notes.postValue(NoteEvent(it, result.isPitched, result.pitch))
+            } ?: run {
+                if (result.isPitched) {
+                    Timber.i("not found note but pitched: Hz: ${result.pitch}")
+                }
             }
         }
 
