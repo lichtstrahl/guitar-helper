@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import iv.game.guitarhelper.R
 import iv.game.guitarhelper.databinding.FragmentMenuBinding
-import iv.game.guitarhelper.ui.addFragment
+import timber.log.Timber
 
 class MenuFragment: Fragment() {
 
@@ -51,16 +51,22 @@ class MenuFragment: Fragment() {
      * @param menuItemId Идентификатор выбранного элемента
      */
     private fun openMenuPage(menuItemId: Int) = when (menuItemId) {
-        R.id.bottom_menu_home -> openMenuPage(HomeFragment(), "menu-home")
-        R.id.bottom_menu_settings -> openMenuPage(SettingsFragment(), "menu-settings")
+        R.id.bottom_menu_home -> openMenuPage(HomeFragment(), HomeFragment.TAG)
+        R.id.bottom_menu_settings -> openMenuPage(SettingsFragment(), SettingsFragment.TAG)
         else ->  throw IllegalStateException("Illegal menu item: $menuItemId")
     }
 
+    /**
+     * 1. Если выбранный фрагмент уже присутствует на вершине стека - ничего не делать
+     * 2. Удаляем из стека последний фрагмент
+     */
     private fun openMenuPage(fragment: Fragment, tag: String) {
+        Timber.d("count fragments: ${childFragmentManager.fragments.size}")
         if (childFragmentManager.fragments.lastOrNull()?.tag != tag) {
-
-            val hideFragment = childFragmentManager.fragments.lastOrNull()
-            childFragmentManager.addFragment(R.id.page_container, fragment, tag, hideFragment)
+            childFragmentManager.beginTransaction()
+                .setCustomAnimations(R.anim.open_fragment, R.anim.close_fragment, R.anim.open_fragment, R.anim.close_fragment)
+                .replace(R.id.page_container, fragment, tag)
+                .commit()
         }
     }
 }

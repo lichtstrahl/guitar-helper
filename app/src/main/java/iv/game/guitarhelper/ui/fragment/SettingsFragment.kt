@@ -34,6 +34,10 @@ class SettingsFragment : Fragment() {
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private var shownRationaleAudioRecord = false
 
+    companion object {
+        const val TAG = "menu-settings"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

@@ -15,13 +15,16 @@
     <string name="not_granted">Не выдано</string>
 
     <!-- menu items -->
-    <string name="menu_item_1">Тестовая запись звука</string>
+    <string name="menu_item_1">Тренировка отдельных нот</string>
     <string name="menu_item_2">Отрисовка и просмотр аккордов</string>
-    <string name="menu_item_3">Ещё какая-то ерунда</string>
+    <string name="menu_item_3">Тестовая запись звука</string>
 
     <!-- win/defeat -->
     <string name="win">Победа</string>
     <string name="defeat">Время вышло</string>
+
+    <!-- LearnNoteFragment -->
+    <string name="count_not_format">%d/%d</string>
 
     <string name="not_content">not-content</string>
 </resources>

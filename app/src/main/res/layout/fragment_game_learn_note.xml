@@ -11,8 +11,17 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/note_view"
+        app:layout_constraintBottom_toTopOf="@id/note_count_view"
         tools:text="@tools:sample/date/hhmmss"/>
+
+    <TextView
+        android:id="@+id/note_count_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/note_view"
+        tools:text="2/5"/>
 
     <TextView
         android:id="@+id/note_view"
@@ -25,21 +34,57 @@
         android:textSize="@dimen/single_note"
         android:text="A"/>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/slide_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black"
-        tools:visibility="gone">
+        android:background="@color/red_extra_dark"
+        tools:alpha="0.3">
 
         <TextView
             android:id="@+id/start_timer_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:textSize="@dimen/single_note"
             android:textColor="@android:color/white"
             tools:text="3"
             android:layout_gravity="center"/>
-    </FrameLayout>
+
+        <ImageView
+            android:id="@+id/back_arrow_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/footer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/again_button"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/red_light"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/again_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/footer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/back_arrow_button"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/red_light"
+            android:visibility="invisible"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/footer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.90"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

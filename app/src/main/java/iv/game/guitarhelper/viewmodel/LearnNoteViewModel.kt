@@ -45,6 +45,9 @@ class LearnNoteViewModel @Inject constructor(
     private val internalCurrentNote = MutableLiveData<NoteEvent>()
     val currentNote: LiveData<NoteEvent> = internalCurrentNote
 
+    private val internalCountNotes = MutableLiveData<Int>()
+    val countNotes: LiveData<Int> = internalCountNotes
+
     private val noteObservers = mutableListOf<Observer<NoteInfo>>()
 
     fun runStartTimer() {
@@ -63,7 +66,7 @@ class LearnNoteViewModel @Inject constructor(
             Timber.d("target: ${internalCurrentNote.value!!.target} note: ${it.target.name} ")
             if (internalCurrentNote.value!!.target == it.target) {
                 if (notes.isNotEmpty()) {
-                    internalCurrentNote.postValue(CurrentNote(notes.pop()))
+                    notes.nextNote(countNotes)
                 } else {
                     internalGameResult.postValue(Win)
                     stopGame()
@@ -75,7 +78,8 @@ class LearnNoteViewModel @Inject constructor(
         noteObservers.add(noteObserver)
         noteAudioProcessor.notes.observeForever(noteObserver)
         audioDispatcher.addAudioProcessor(noteAudioProcessor)
-        internalCurrentNote.postValue(CurrentNote(notes.pop()))
+
+        notes.nextNote(countNotes)
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) { audioDispatcher.run() }
@@ -130,6 +134,15 @@ class LearnNoteViewModel @Inject constructor(
         audioDispatcher.stop()
         noteObservers.forEach(noteAudioProcessor.notes::removeObserver)
         noteObservers.clear()
+    }
+
+    /**
+     * Оповещение UI о том сколько нот сыграно и переход в ожидание следующей
+     * @param countNotes Сколько нот всего
+     */
+    private fun Stack<Note>.nextNote(countNotes: Int) {
+        internalCountNotes.postValue(countNotes-this.size)
+        internalCurrentNote.postValue(CurrentNote(this.pop()))
     }
 
     /**

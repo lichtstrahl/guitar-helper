@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import iv.game.guitarhelper.R
 import iv.game.guitarhelper.databinding.FragmentHomeBinding
-import iv.game.guitarhelper.ui.addFragment
 import iv.game.guitarhelper.ui.component.adapter.HomeMenuItemAdapter
 import iv.game.guitarhelper.ui.component.model.HomeMenuItem
 import iv.game.guitarhelper.ui.fragment.game.LearnNoteFragment
+import timber.log.Timber
 
 class HomeFragment: Fragment() {
 
@@ -24,7 +24,14 @@ class HomeFragment: Fragment() {
 
     // Utils
     private val menuItemListener = { f: Fragment ->
-        this.parentFragmentManager.addFragment(R.id.page_container, f, "menu-item", this, false)
+        this.parentFragmentManager.beginTransaction()
+            .add(R.id.page_container, f, "menu-item")
+            .hide(this)
+            .commit()
+    }
+
+    companion object {
+        const val TAG = "menu-home"
     }
 
     override fun onCreateView(
@@ -42,6 +49,16 @@ class HomeFragment: Fragment() {
         return view
     }
 
+    override fun onStart() {
+        super.onStart()
+        Timber.d("onStart")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.d("onStop")
+    }
+
     // ---
     // PRIVATE
     // ---
@@ -52,8 +69,8 @@ class HomeFragment: Fragment() {
     }
 
     private fun menuItems(): List<HomeMenuItem> = listOf(
-        HomeMenuItem(requireContext(), R.string.menu_item_1, R.drawable.ic_music_note, R.color.green_light) { AudioRecordFragment() },
+        HomeMenuItem(requireContext(), R.string.menu_item_1, R.drawable.ic_music_note, R.color.green_light) { LearnNoteFragment.getInstance(5, 10) },
         HomeMenuItem(requireContext(), R.string.menu_item_2, R.drawable.ic_columns, R.color.yellow_light) { AudioRecordFragment() },
-        HomeMenuItem(requireContext(), R.string.menu_item_3, R.drawable.ic_sk_key, R.color.orange_light) { LearnNoteFragment.getInstance(20, 10) }
+        HomeMenuItem(requireContext(), R.string.menu_item_3, R.drawable.ic_sk_key, R.color.orange_light) { AudioRecordFragment() }
     )
 }

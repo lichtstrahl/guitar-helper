@@ -6,21 +6,21 @@ enum class Note(
 //    val title: String,
     val rate: Float
 ) {
-    e(329.63f),
-    B(246.94f),
-    G(196.00f),
-    D(146.83f),
-    A(110.00f),
-    E(82.41f);
+    e0(329.63f),
+    B0(246.94f),
+    G0(196.00f),
+    D0(146.83f),
+    A0(110.00f),
+    E0(82.41f);
 
     companion object {
-        private const val EPS = 10.5
+        private const val EPS = 8.5
 
         /**
          * Поиск ноты по частоте с заданной точностью
          * @return null если ноту не удалось определить
          */
-        fun note(hz: Float, eps: Double = EPS): Note? = Note.values().firstOrNull { abs(it.rate-hz) < EPS }
+        fun note(hz: Float, eps: Double = EPS): Note? = Note.values().firstOrNull { abs(it.rate-hz) < eps }
     }
 
 

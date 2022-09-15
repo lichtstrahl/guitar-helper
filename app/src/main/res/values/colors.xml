@@ -13,4 +13,5 @@
     <color name="yellow_light">#FFF59D</color>
     <color name="orange_light">#FFCC80</color>
     <color name="red_dark">#AE2323</color>
+    <color name="red_extra_dark">#630F0F</color>
 </resources>
